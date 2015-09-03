@@ -38,3 +38,22 @@
                                         ;=> {:a 1 :b 2 :c 3}
 
 
+;; about `into`:
+;; If into were asked to describe its strengths at a job interview, it would say, “I’m great at taking two collections and adding all the elements from the second to the first.”
+
+;; Function Functions
+
+;;; apply
+
+(max 0 1 2)
+(apply max [0 1 2])
+
+(defn my-into
+  [target additions]
+  (apply conj target additions))
+
+;;; partial
+
+(def add20 (partial + 20))
+
+(def not-nil? (complement nil?))
