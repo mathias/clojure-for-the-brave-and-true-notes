@@ -57,3 +57,26 @@
 (def add20 (partial + 20))
 
 (def not-nil? (complement nil?))
+
+;; Chapter 5
+((comp inc *) 3 4)
+                                        ;=> 13
+
+(def character
+  {:name "Smooches McCute"
+   :attributes {:intelligence 10
+                :strength 4
+                :dexterity 5}})
+
+(def c-int (comp :intelligence :attributes))
+(def c-str (comp :strength :attributes))
+(def c-dex (comp :dexterity :attributes))
+
+; (fn [c] (:strength (:attributes c)))
+
+(defn spell-slots
+  [char]
+  (int (inc (/ (c-int char) 2))))
+(spell-slots character)
+
+(def spell-slots-comp (comp int inc #(/ % 2) c-int))
