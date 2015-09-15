@@ -40,3 +40,31 @@
   `(let [~errors-name (validate ~to-validate ~validations)]
      (if (empty? ~errors-name)
        ~@then-else)))
+
+(if-valid order-details
+          order-details-validations
+          my-error-name
+          (println :success)
+          (println :failure my-error-name))
+
+;; Exercises
+;;
+;; 1. Write the macro when-valid so that it behaves similarly to when.
+(def order-details-validation
+  ["Please enter a name" not-empty])
+
+(defmacro when-valid
+  "Run body when valid"
+  [to-validate validations & then]
+  `(if (empty? (validate ~to-validate ~validations))
+     (do
+       ~@then)))
+
+(def valid-order-details
+  {:name "Foo"
+   :email "matt@example.com"})
+
+(when-valid valid-order-details
+            order-details-validations
+            (println "It's a success!")
+            (println "render success"))
