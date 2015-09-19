@@ -80,3 +80,41 @@
 (spell-slots character)
 
 (def spell-slots-comp (comp int inc #(/ % 2) c-int))
+
+;;;; Chapter 9 Exercises
+;; 1. Write a function that takes a string as an argument and searches for it on Bing and Google using the slurp function. Your function should return the HTML of the first page returned by the search.
+(defn goog-search-url
+  [search-term]
+  (str "https://www.google.com/search?hl=en&q=" search-term))
+
+(defn bing-search-url
+  [search-term]
+  (str "https://www.bing.com/search?q=" search-term))
+
+(defn search [search-term]
+  (let [result (promise)]
+    (doseq [engine [goog-search-url bing-search-url]]
+      (future (if-let [results-page (slurp (engine search-term))]
+                (deliver result results-page))))
+    @result))
+
+;; 2. Update your function so it takes a second argument consisting of the search engines to use.
+
+(defn search-on-engines [search-term & engine-names]
+  (let [engines {:bing bing-search-url :google goog-search-url}
+        result (promise)]
+    (doseq [engine-name engine-names]
+      (future (if-let [results-page (slurp ((get engines engine-name) search-term))]
+                (deliver result results-page))))
+    (deref result 5000 :timeout)))
+
+;; Note that Google doesn't seem to work, it always returns a 403
+
+;; 3. Create a new function that takes a search term and search engines as arguments, and returns a vector of the URLs from the first page of search results from each search engine.
+
+(defn results-from-search [search-term & engines]
+  (let [results-page (search-on-engines search-term engines)
+        matches (re-seq #"href=\"([^\" ]*)\"" results)
+        uris (map second matches)
+        external-links (filter #(re-find #"http(?s)://" %) uris)]
+    external-links))
